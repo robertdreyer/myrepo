@@ -1,0 +1,51 @@
+---
+title: "Homework 1"
+output: html_document
+date: '2022-09-23'
+---
+
+```{r}
+library(dplyr)
+#install.packages("nycflights13")
+```
+```{r}
+library(nycflights13)
+library(ggplot2)
+
+```
+
+
+#Q1
+```{r}
+no_dep <- subset(flights, is.na(flights$dep_time))
+count(no_dep)
+no_dep
+```
+8255 flights are missing a departure time. dep_delay, arr_time, arr_delay, and air_time are also missing values in these rows. These rows might represent cancelled flights because they never departed or arrived, meaning that the flight never took place. 
+
+#Q2
+```{r}
+
+minutes_flights <- flights %>% 
+  mutate(flights, 
+         dep_minutes = 60*as.integer(substr(as.character(dep_time), 1, nchar(dep_time)-2)) 
+         + as.integer(substr(as.character(dep_time), nchar(dep_time)-1, nchar(dep_time))),
+         arr_minutes = 60*as.integer(substr(as.character(arr_time), 1, nchar(arr_time)-2)) 
+         + as.integer(substr(as.character(dep_time), nchar(arr_time)-1, nchar(arr_time))))
+         
+select(minutes_flights, dep_time, dep_minutes, arr_time, arr_minutes, everything())
+
+```
+
+#Q3
+```{r}
+
+flights %>% group_by(month, day) %>%
+  summarise(total = n(), cancelled = sum(is.na(dep_time)), avg_delay = mean(dep_delay, na.rm = TRUE)) %>%
+  mutate(cancel_prop = cancelled/total) %>%
+  ggplot(aes(x = cancel_prop,y = avg_delay)) + geom_point()
+
+```
+
+
+
